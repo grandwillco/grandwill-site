@@ -15,14 +15,18 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^9.0.0",
+    "@tailwindcss/postcss": "^9.1.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "15.5.2",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3"
   },
   "engines": {
-    "node": ">=18.18 <21"
+    "node": ">=20 <21"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "next": {
     "typescript": {
