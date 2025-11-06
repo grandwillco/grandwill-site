@@ -5,28 +5,27 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import clsx from "clsx";
 
-type Product = {
-  src: string;          // e.g., "/products/your-image.jpg"
-  title?: string;       // short caption headline
-  subtitle?: string;    // optional supporting line
+export type Slide = {
+  src: string;      // "/products/Your Image.jpg"
+  title?: string;   // optional caption
+  subtitle?: string;
 };
 
 export default function ProductSlideshow({
   products,
-  intervalMs = 4000,
+  intervalMs = 4500,
 }: {
-  products: Product[];
+  products: Slide[];
   intervalMs?: number;
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<NodeJS.Timeout | null>(null);
-
   const count = products.length;
 
+  // autoplay timer
   useEffect(() => {
     if (count <= 1) return;
-
     if (!paused) {
       timer.current = setInterval(() => {
         setIndex((i) => (i + 1) % count);
@@ -41,20 +40,23 @@ export default function ProductSlideshow({
     if (timer.current) clearInterval(timer.current);
     setIndex((n + count) % count);
   };
-
   const prev = () => go(index - 1);
   const next = () => go(index + 1);
 
-  // Keyboard navigation
+  // keyboard navigation — avoid referencing prev/next to satisfy exhaustive-deps
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-      if (e.key.toLowerCase() === " ") setPaused((p) => !p);
+      if (e.key === "ArrowLeft") {
+        setIndex((i) => (i - 1 + count) % count);
+      } else if (e.key === "ArrowRight") {
+        setIndex((i) => (i + 1) % count);
+      } else if (e.key === " ") {
+        setPaused((p) => !p);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [index]);
+  }, [count]);
 
   const current = products[index];
 
@@ -66,10 +68,8 @@ export default function ProductSlideshow({
       aria-roledescription="carousel"
       aria-label="Product slideshow"
     >
-      {/* Frame */}
       <div className="aspect-[4/3] rounded-none border border-white/15 bg-black overflow-hidden">
-        {/* Image */}
-        {current?.src ? (
+        {current ? (
           <Image
             src={current.src}
             alt={current.title ?? "Product image"}
@@ -80,20 +80,15 @@ export default function ProductSlideshow({
           />
         ) : (
           <div className="w-full h-full grid place-content-center text-white/50 text-sm">
-            Add images to /public/products to populate the slideshow
+            Add images to <code>/public/products</code>
           </div>
         )}
 
-        {/* Gradient for legibility */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-
-        {/* Caption */}
         {(current?.title || current?.subtitle) && (
           <div className="absolute bottom-0 left-0 right-0 p-4">
             {current?.title && (
-              <p className="text-white font-bold tracking-wide uppercase">
-                {current.title}
-              </p>
+              <p className="text-white font-bold tracking-wide uppercase">{current.title}</p>
             )}
             {current?.subtitle && (
               <p className="text-white/80 text-sm mt-0.5">{current.subtitle}</p>
@@ -102,10 +97,8 @@ export default function ProductSlideshow({
         )}
       </div>
 
-      {/* Controls */}
       {count > 1 && (
         <>
-          {/* Prev / Next */}
           <button
             onClick={prev}
             aria-label="Previous slide"
@@ -121,7 +114,6 @@ export default function ProductSlideshow({
             <ChevronRight className="h-5 w-5" />
           </button>
 
-          {/* Dots + Pause/Play */}
           <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
             <button
               onClick={() => setPaused((p) => !p)}
