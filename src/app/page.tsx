@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+export const dynamic = "force-static";
+
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,57 +8,47 @@ import LogoTile from "./_components/LogoTile";
 import ProductSlideshow, { Slide } from "./_components/ProductSlideshow";
 import ContactForm from "./_components/ContactForm";
 
+// ---- Slideshow images (exact filenames in /public/products) ----
+const products: Slide[] = [
+  { src: "/products/Hooks Game.png", title: "Hooks Game" },
+  { src: "/products/Monkee Mount.png", title: "Monkee Mount" },
+  { src: "/products/Pic Patio Lantern 2.png", title: "PIC Patio Lantern" },
+  { src: "/products/PIC Repellant.png", title: "PIC Repellant" },
+  { src: "/products/Pic Zapping Lantern Outside.png", title: "PIC Zapping Lantern" },
+  { src: "/products/Softside on Tub Close.png", title: "Softside on Tub Close" },
+  { src: "/products/Stealthrig.png", title: "Stealthrig" },
+];
+
+// ---- Brands (with per-logo scaling) ----
+const brands: { name: string; scale?: number }[] = [
+  { name: "Walmart", scale: 0.92 },
+  { name: "Lowe’s", scale: 1.25 },
+  { name: "Home Depot", scale: 1.3 },
+  { name: "Ace Hardware", scale: 0.92 },
+  { name: "Amazon", scale: 0.88 },
+  { name: "PIC Corporation", scale: 1.35 },
+  { name: "SC Johnson / RAID", scale: 1.3 },
+  { name: "Dick’s Sporting Goods" },
+];
+
+const bullets = [
+  "PIC Corporation (SCJ/RAID licensee)",
+  "Retailers: Walmart • Lowe's • Ace • Home Depot • Amazon",
+  "50+ products developed in 5 years",
+  "$5M+ products sold over the last 2 years",
+];
+
+const industries = [
+  { name: "Aerospace", icon: <ShieldCheck className="h-5 w-5" /> },
+  { name: "Medical", icon: <ShieldCheck className="h-5 w-5" /> },
+  { name: "Consumer", icon: <ShieldCheck className="h-5 w-5" /> },
+  { name: "Automotive", icon: <ShieldCheck className="h-5 w-5" /> },
+];
+
 export default function HomePage() {
-  // --- discover images in /public/products ---
-  const dir = path.join(process.cwd(), "public", "products");
-  let entries: string[] = [];
-  try {
-    entries = fs
-      .readdirSync(dir, { withFileTypes: true })
-      .filter((d) => d.isFile())
-      .map((d) => d.name)
-      .filter((f) => /\.(png|jpe?g|webp|gif)$/i.test(f))
-      .sort();
-  } catch {
-    entries = [];
-  }
-
-  const products: Slide[] = entries.map((file) => {
-    const base = file.replace(/\.[^/.]+$/, "");
-    const title = base
-      .replace(/[_\-]+/g, " ")
-      .replace(/\b\w/g, (m) => m.toUpperCase());
-    return { src: `/products/${file}`, title };
-  });
-
-  const bullets = [
-    "PIC Corporation (SCJ/RAID licensee)",
-    "Retailers: Walmart • Lowe's • Ace • Home Depot • Amazon",
-    "50+ products developed in 5 years",
-    "$5M+ products sold over the last 2 years",
-  ];
-
-  const brands: { name: string; scale?: number }[] = [
-    { name: "Walmart", scale: 0.92 },
-    { name: "Lowe’s", scale: 1.25 },
-    { name: "Home Depot", scale: 1.3 },
-    { name: "Ace Hardware", scale: 0.92 },
-    { name: "Amazon", scale: 0.88 },
-    { name: "PIC Corporation", scale: 1.35 },
-    { name: "SC Johnson / RAID", scale: 1.3 },
-    { name: "Dick’s Sporting Goods" },
-  ];
-
-  const industries = [
-    { name: "Aerospace", icon: <ShieldCheck className="h-5 w-5" /> },
-    { name: "Medical", icon: <ShieldCheck className="h-5 w-5" /> },
-    { name: "Consumer", icon: <ShieldCheck className="h-5 w-5" /> },
-    { name: "Automotive", icon: <ShieldCheck className="h-5 w-5" /> },
-  ];
-
   return (
     <>
-      {/* HERO — centered; slideshow between headline and rest */}
+      {/* HERO — centered; slideshow between headline and description/CTAs */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.08),transparent_60%)]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
